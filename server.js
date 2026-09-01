@@ -2,7 +2,7 @@ import express from "express"
 
 const app = express()
 
-const delay = 1000
+const delay = 0
 
 const hotels = [
     {

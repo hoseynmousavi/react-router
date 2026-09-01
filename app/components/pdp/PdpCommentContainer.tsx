@@ -1,12 +1,7 @@
-import {useQuery} from "@tanstack/react-query"
+"use client"
 
-export type Comment = {
-    id: string
-    name: string
-    date: string
-    rating: number
-    text: string
-}
+import {useQuery} from "@tanstack/react-query"
+import {getComments, type Comment} from "~/data/comments"
 
 export function PdpCommentContainer({slug, initialComments}: {
     slug: string
@@ -60,14 +55,4 @@ function CommentsGridSkeleton() {
             {[0, 1, 2].map((item) => <div key={item} className="h-64 animate-pulse rounded-3xl bg-slate-200 dark:bg-zinc-900"/>)}
         </div>
     )
-}
-
-export async function getComments(slug: string): Promise<Array<Comment>> {
-    const response = await fetch(`http://localhost:4000/pdp/${encodeURIComponent(slug)}/comments`)
-
-    if (!response.ok) {
-        throw new Error("Could not load comments")
-    }
-
-    return response.json()
 }

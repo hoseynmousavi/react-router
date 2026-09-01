@@ -1,9 +1,11 @@
-import {getHotels, PlpContainer, type Hotel} from "~/components/plp/PlpContainer"
+import {Suspense, use} from "react"
+import {PlpContainer} from "~/components/plp/PlpContainer"
+import {getHotels, type Hotel} from "~/data/hotels"
 import {getDefaultSeoDates} from "~/utils/date-utils"
 import type {Route} from "./+types/plp"
 
 type PlpLoaderData = {
-    hotels: Array<Hotel> | undefined
+    hotels: Promise<Array<Hotel>> | undefined
 }
 
 export async function loader({request}: Route.LoaderArgs): Promise<PlpLoaderData> {
@@ -17,14 +19,11 @@ export async function loader({request}: Route.LoaderArgs): Promise<PlpLoaderData
 
     const {stDate: defaultStDate, rtDate: defaultRtDate} = getDefaultSeoDates()
     return {
-        hotels: await getHotels(defaultStDate, defaultRtDate),
+        hotels: getHotels(defaultStDate, defaultRtDate),
     }
 }
 
-export async function clientLoader() {
-}
-
-export default function Plp({loaderData}: Route.ComponentProps) {
+export function ServerComponent({loaderData}: Route.ServerComponentProps) {
     return (
         <section className="relative flex-1 overflow-hidden bg-slate-50 dark:bg-zinc-950">
             <div className="pointer-events-none absolute -left-32 top-16 size-80 rounded-full bg-sky-200/50 blur-3xl dark:bg-sky-900/20"/>
@@ -43,10 +42,33 @@ export default function Plp({loaderData}: Route.ComponentProps) {
                     </p>
                 </div>
 
-                <PlpContainer
-                    initialHotels={loaderData?.hotels}
-                />
+                {loaderData.hotels ? (
+                    <Suspense fallback={<PlpStreamingFallback/>}>
+                        <InitialPlp hotels={loaderData.hotels}/>
+                    </Suspense>
+                ) : (
+                    <PlpContainer/>
+                )}
             </div>
         </section>
+    )
+}
+
+function InitialPlp({hotels}: { hotels: Promise<Array<Hotel>> }) {
+    return <PlpContainer initialHotels={use(hotels)}/>
+}
+
+function PlpStreamingFallback() {
+    return (
+        <div className="space-y-9" aria-busy="true" aria-label="Streaming stays from the server">
+            <div className="rounded-3xl border border-sky-200 bg-sky-50 p-5 text-sm font-semibold text-sky-700 shadow-sm dark:border-sky-900/60 dark:bg-sky-950/30 dark:text-sky-300">
+                Streaming stays from the server…
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {[0, 1, 2].map((item) => (
+                    <div key={item} className="h-72 animate-pulse rounded-3xl bg-slate-200 dark:bg-zinc-900"/>
+                ))}
+            </div>
+        </div>
     )
 }

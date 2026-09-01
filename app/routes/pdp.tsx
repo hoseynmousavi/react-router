@@ -1,7 +1,9 @@
 import {useQuery} from "@tanstack/react-query"
 import {Link} from "react-router"
-import {getComments, PdpCommentContainer, type Comment} from "~/components/pdp/PdpCommentContainer"
-import {getRooms, PdpRoomContainer, type Room} from "~/components/pdp/PdpRoomContainer"
+import {PdpCommentContainer} from "~/components/pdp/PdpCommentContainer"
+import {PdpRoomContainer} from "~/components/pdp/PdpRoomContainer"
+import {getComments, type Comment} from "~/data/comments"
+import {getRooms, type Room} from "~/data/rooms"
 import {getDefaultSeoDates} from "~/utils/date-utils"
 import type {Route} from "./+types/pdp"
 

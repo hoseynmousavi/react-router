@@ -1,18 +1,10 @@
+"use client"
+
 import {useQuery} from "@tanstack/react-query"
 import {useSearchParams} from "react-router"
 import {useState, type FormEvent} from "react"
+import {getRooms, type Room} from "~/data/rooms"
 import {addDays, getDefaultSeoDates} from "~/utils/date-utils"
-
-export type Room = {
-    id: string
-    name: string
-    description: string
-    capacity: number
-    bed: string
-    price: number
-    remaining: number
-    amenities: Array<string>
-}
 
 export function PdpRoomContainer({slug, initialRooms, initialStDate, initialRtDate}: {
     slug: string
@@ -174,15 +166,4 @@ function getNightCount(stDate: string, rtDate: string) {
     const start = new Date(`${stDate}T00:00:00Z`).getTime()
     const end = new Date(`${rtDate}T00:00:00Z`).getTime()
     return Math.max(1, Math.round((end - start) / 86_400_000))
-}
-
-export async function getRooms(slug: string, stDate: string, rtDate: string): Promise<Array<Room>> {
-    const params = new URLSearchParams({stDate, rtDate})
-    const response = await fetch(`http://localhost:4000/pdp/${encodeURIComponent(slug)}/rooms?${params}`)
-
-    if (!response.ok) {
-        throw new Error("Could not load rooms")
-    }
-
-    return response.json()
 }
