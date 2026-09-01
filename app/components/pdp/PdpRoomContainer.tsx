@@ -14,11 +14,9 @@ export type Room = {
     amenities: Array<string>
 }
 
-export function PdpRoomContainer({slug, initialRooms, initialStDate, initialRtDate}: {
+export function PdpRoomContainer({slug, initialRooms}: {
     slug: string
     initialRooms?: Array<Room>
-    initialStDate?: string
-    initialRtDate?: string
 }) {
     const [searchParams, setSearchParams] = useSearchParams()
     const stDateParam = searchParams.get("stDate")
@@ -30,7 +28,7 @@ export function PdpRoomContainer({slug, initialRooms, initialStDate, initialRtDa
     const {data = [], isPending, isFetching, isError} = useQuery({
         queryKey: ["rooms", slug, stDate, rtDate],
         queryFn: () => getRooms(slug, stDate, rtDate),
-        initialData: initialStDate === stDate && initialRtDate === rtDate ? initialRooms : undefined,
+        initialData: initialRooms && !stDateParam && !rtDateParam ? initialRooms : undefined,
         staleTime: 5 * 60 * 1000,
     })
 

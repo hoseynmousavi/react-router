@@ -21,22 +21,25 @@ type PdpLoaderData = {
     detail: PdpDetail
     rooms: Array<Room>
     comments: Array<Comment>
-    stDate: string
-    rtDate: string
-}
+} | undefined
 
 export async function loader({params, request}: Route.LoaderArgs): Promise<PdpLoaderData> {
     const url = new URL(request.url)
-    const defaultDates = getDefaultSeoDates()
-    const stDate = url.searchParams.get("stDate") || defaultDates.stDate
-    const rtDate = url.searchParams.get("rtDate") || defaultDates.rtDate
+    const stDate = url.searchParams.get("stDate")
+    const rtDate = url.searchParams.get("rtDate")
+
+    if (stDate && rtDate) {
+        return undefined
+    }
+
+    const {stDate: defaultStDate, rtDate: defaultRtDate} = getDefaultSeoDates()
     const [detail, rooms, comments] = await Promise.all([
         getProperty(params.slug),
-        getRooms(params.slug, stDate, rtDate),
+        getRooms(params.slug, defaultStDate, defaultRtDate),
         getComments(params.slug),
     ])
 
-    return {detail, rooms, comments, stDate, rtDate}
+    return {detail, rooms, comments}
 }
 
 export async function clientLoader() {
@@ -56,8 +59,6 @@ export default function Pdp({loaderData, params}: Route.ComponentProps) {
                 <PdpRoomContainer
                     slug={params.slug}
                     initialRooms={initialDataMatchesSlug ? loaderData.rooms : undefined}
-                    initialStDate={initialDataMatchesSlug ? loaderData.stDate : undefined}
-                    initialRtDate={initialDataMatchesSlug ? loaderData.rtDate : undefined}
                 />
 
                 <section className="mt-16 border-t border-slate-200 pt-12 dark:border-white/10">

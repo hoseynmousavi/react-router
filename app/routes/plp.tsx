@@ -3,8 +3,8 @@ import {getDefaultSeoDates} from "~/utils/date-utils"
 import type {Route} from "./+types/plp"
 
 type PlpLoaderData = {
-    hotels: Array<Hotel> | undefined
-}
+    hotels: Array<Hotel>
+} | undefined
 
 export async function loader({request}: Route.LoaderArgs): Promise<PlpLoaderData> {
     const url = new URL(request.url)
@@ -12,7 +12,7 @@ export async function loader({request}: Route.LoaderArgs): Promise<PlpLoaderData
     const rtDate = url.searchParams.get("rtDate")
 
     if (stDate && rtDate) {
-        return {hotels: undefined}
+        return undefined
     }
 
     const {stDate: defaultStDate, rtDate: defaultRtDate} = getDefaultSeoDates()
