@@ -16,7 +16,7 @@ export type Hotel = {
 }
 
 export function PlpContainer({initialHotels}: {
-    initialHotels?: Array<Hotel>
+    initialHotels: Array<Hotel> | undefined
 }) {
     const [searchParams, setSearchParams] = useSearchParams()
     const stDateParam = searchParams.get("stDate")
@@ -29,7 +29,7 @@ export function PlpContainer({initialHotels}: {
     const {data = [], isPending, isFetching, isError} = useQuery({
         queryKey: ["hotels", stDate, rtDate],
         queryFn: () => getHotels(stDate, rtDate),
-        initialData: initialHotels && !stDateParam && !rtDateParam ? initialHotels : undefined,
+        initialData: initialHotels,
         staleTime: 5 * 60 * 1000,
     })
 

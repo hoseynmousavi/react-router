@@ -16,7 +16,7 @@ export type Room = {
 
 export function PdpRoomContainer({slug, initialRooms}: {
     slug: string
-    initialRooms?: Array<Room>
+    initialRooms: Array<Room> | undefined
 }) {
     const [searchParams, setSearchParams] = useSearchParams()
     const stDateParam = searchParams.get("stDate")
@@ -28,7 +28,7 @@ export function PdpRoomContainer({slug, initialRooms}: {
     const {data = [], isPending, isFetching, isError} = useQuery({
         queryKey: ["rooms", slug, stDate, rtDate],
         queryFn: () => getRooms(slug, stDate, rtDate),
-        initialData: initialRooms && !stDateParam && !rtDateParam ? initialRooms : undefined,
+        initialData: initialRooms,
         staleTime: 5 * 60 * 1000,
     })
 
@@ -67,7 +67,7 @@ export function PdpRoomContainer({slug, initialRooms}: {
                     <RoomGridSkeleton/>
                 ) : (
                     <div className={`grid gap-5 transition-opacity lg:grid-cols-2 ${isFetching ? "opacity-55" : "opacity-100"}`} aria-busy={isFetching}>
-                        {data.map((room, index) => <RoomCard key={room.id} room={room} index={index} nights={getNightCount(stDate, rtDate)}/>) }
+                        {data.map((room, index) => <RoomCard key={room.id} room={room} index={index} nights={getNightCount(stDate, rtDate)}/>)}
                     </div>
                 )}
             </div>

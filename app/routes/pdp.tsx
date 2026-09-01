@@ -46,19 +46,17 @@ export async function clientLoader() {
 }
 
 export default function Pdp({loaderData, params}: Route.ComponentProps) {
-    const initialDataMatchesSlug = loaderData?.detail.slug === params.slug
-
     return (
         <div className="flex-1 bg-slate-50 dark:bg-zinc-950">
             <PropertyHeroContainer
                 slug={params.slug}
-                initialDetail={initialDataMatchesSlug ? loaderData.detail : undefined}
+                initialDetail={loaderData?.detail}
             />
 
             <div className="mx-auto w-full max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
                 <PdpRoomContainer
                     slug={params.slug}
-                    initialRooms={initialDataMatchesSlug ? loaderData.rooms : undefined}
+                    initialRooms={loaderData?.rooms}
                 />
 
                 <section className="mt-16 border-t border-slate-200 pt-12 dark:border-white/10">
@@ -68,7 +66,7 @@ export default function Pdp({loaderData, params}: Route.ComponentProps) {
                     </div>
                     <PdpCommentContainer
                         slug={params.slug}
-                        initialComments={initialDataMatchesSlug ? loaderData.comments : undefined}
+                        initialComments={loaderData?.comments}
                     />
                 </section>
             </div>
@@ -76,7 +74,7 @@ export default function Pdp({loaderData, params}: Route.ComponentProps) {
     )
 }
 
-function PropertyHeroContainer({slug, initialDetail}: { slug: string, initialDetail?: PdpDetail }) {
+function PropertyHeroContainer({slug, initialDetail}: { slug: string, initialDetail: PdpDetail | undefined }) {
     const query = useQuery({
         queryKey: ["property", slug],
         queryFn: () => getProperty(slug),

@@ -10,7 +10,7 @@ export type Comment = {
 
 export function PdpCommentContainer({slug, initialComments}: {
     slug: string
-    initialComments?: Array<Comment>
+    initialComments: Array<Comment> | undefined
 }) {
     const {data = [], isPending, isError} = useQuery({
         queryKey: ["comments", slug],
