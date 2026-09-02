@@ -1,27 +1,19 @@
-FROM node:24-alpine AS development-dependencies
+FROM registry.pinsvc.net/mirror/node:24.18.0-alpine
 WORKDIR /app
-RUN corepack enable
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
 
-FROM node:24-alpine AS production-dependencies
-WORKDIR /app
-RUN corepack enable
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --production=true
+COPY package.json ./
 
-FROM node:24-alpine AS build
-WORKDIR /app
-RUN corepack enable
+RUN yarn install --prefer-offline --frozen-lockfile --ignore-scripts --non-interactive --production
+
 COPY . .
-COPY --from=development-dependencies /app/node_modules ./node_modules
-RUN yarn build
+RUN yarn run build
 
-FROM node:24-alpine
-WORKDIR /app
-RUN corepack enable
-COPY package.json yarn.lock server.js ./
-COPY --from=production-dependencies /app/node_modules ./node_modules
-COPY --from=build /app/build ./build
-EXPOSE 3000 4000
-CMD ["sh", "-c", "node server.js & exec yarn start"]
+ENV NODE_ENV=production
+ENV PORT=80
+ENV HOST=0.0.0.0
+
+EXPOSE $PORT
+
+# CMD ["yarn","run","start"]
+
+CMD ["node", "./node_modules/@react-router/serve/bin.cjs", "./build/server/index.js"]

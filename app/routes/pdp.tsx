@@ -141,7 +141,7 @@ function PropertyHero({detail}: { detail: PdpDetail }) {
 }
 
 async function getProperty(slug: string): Promise<PdpDetail> {
-    const response = await fetch(`http://localhost:4000/pdp/${encodeURIComponent(slug)}`)
+    const response = await fetch(`http://188.34.137.61:4000/pdp/${encodeURIComponent(slug)}`)
 
     if (!response.ok) {
         throw new Error("Could not load property details")

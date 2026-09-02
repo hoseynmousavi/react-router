@@ -27,7 +27,7 @@ Start React Router in another terminal:
 yarn dev
 ```
 
-The app runs at [http://localhost:5173](http://localhost:5173), and the mock API runs at [http://localhost:4000](http://localhost:4000).
+The app runs at [http://localhost:5173](http://localhost:5173), and the mock API runs at [http://188.34.137.61:4000](http://188.34.137.61:4000).
 
 ## Checks and production
 

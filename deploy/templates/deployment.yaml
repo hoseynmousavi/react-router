@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "projects-template.fullname" . }}
+  labels:
+    {{- include "projects-template.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "projects-template.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "projects-template.selectorLabels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecrets }}
+      serviceAccountName: {{ include "projects-template.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image }}"
+
+          resources:
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+
+          ports:
+            - name: {{ .Values.containers.ports.name }}
+              containerPort: {{ .Values.containers.ports.containerPort }}
+              protocol: {{ .Values.containers.ports.protocol }}
+          livenessProbe:
+            failureThreshold: 1
+            successThreshold: 1
+            periodSeconds: 10
+            timeoutSeconds: 20
+            httpGet:
+              path: {{ .Values.probe.livenessPath }}
+              port: {{ .Values.containers.ports.name  }}
+
+          readinessProbe:
+            failureThreshold: 1
+            successThreshold: 1
+            periodSeconds: 10
+            timeoutSeconds: 20
+            httpGet:
+              path: {{ .Values.probe.readinessPath }}
+              port: {{ .Values.containers.ports.name  }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+

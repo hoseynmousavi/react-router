@@ -1,0 +1,54 @@
+stages: [build, deploy]
+
+.build:
+  stage: build
+  retry: 2
+  script:
+    - docker login -u $REG_USER $REG_SERVER -p $REG_PASSWORD
+    - DOCKER_BUILDKIT=1 docker build -t $REG_SERVER/$IMAGE_TAG:$IMAGE_VERSION .
+    - docker push $REG_SERVER/$IMAGE_TAG:$IMAGE_VERSION
+    - docker image rm $REG_SERVER/$IMAGE_TAG:$IMAGE_VERSION || true
+
+.deploy:
+  stage: deploy
+  retry: 2
+  resource_group: deploy_group
+  script:
+    - HELM_ARGS="
+      --kube-context $KUBE_CONTEXT
+      --namespace $CI_PROJECT_NAMESPACE
+      --set namespace=$CI_PROJECT_NAMESPACE
+      --set imagePullSecrets=$IMAGE_PULL_SECRETS
+      --set image=$REGISTRY/$IMAGE_TAG:$IMAGE_VERSION";
+    - helm template $HELM_ARGS deploy
+    - helm upgrade $HELM_ARGS --wait --force --install $IMAGE_REF_NAME-$CI_PROJECT_NAME deploy
+
+build_beta:
+  tags: [front]
+  extends: [.build]
+  variables:
+    IMAGE_TAG: $CI_PROJECT_PATH/beta
+    IMAGE_VERSION: $CI_COMMIT_SHORT_SHA
+    REG_SERVER: $CI_REGISTRY
+    REG_USER: gitlab-ci-token
+    REG_PASSWORD: $CI_JOB_TOKEN
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $FORCE_DEPLOY == $CI_PROJECT_NAME
+
+deploy_beta:
+  tags: [asia]
+  extends: [.deploy]
+  variables:
+    IMAGE_TAG: $CI_PROJECT_PATH/beta
+    IMAGE_VERSION: $CI_COMMIT_SHORT_SHA
+    REGISTRY: git.pinsvc.net:4567
+    IMAGE_REF_NAME: asia
+    IMAGE_PULL_SECRETS: gitsecret
+    CONTEXT: asia
+    KUBE_CONTEXT: asia
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $FORCE_DEPLOY == $CI_PROJECT_NAME
+  needs:
+    - build_beta

@@ -1,0 +1,54 @@
+projectName: stack-react-router
+image:
+  repository: git.pinsvc.net
+  pullPolicy: IfNotPresent
+  tag: ""
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+podAnnotations: {}
+podSecurityContext: {}
+securityContext: {}
+service:
+  type: ClusterIP
+  port: 80
+containers:
+  ports:
+    name: app
+    containerPort: 80
+    protocol: TCP
+resources:
+  limits:
+    cpu: "1024m"
+    memory: "1Gi"
+  requests:
+    cpu: "256m"
+    memory: "300Mi"
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+nodeSelector: {}
+tolerations: []
+affinity: {}
+replicaCount: 1
+probe:
+  livenessPath: "/"
+  readinessPath: "/"
+ingress:
+  className: kong
+  enabled: true
+  annotations:
+    konghq.com/strip-path: "true"
+  hosts:
+    - host: stack-react-router.st-beta.dev
+      paths:
+        - path: "/"
+          pathType: Prefix
+  tls: []

@@ -176,7 +176,7 @@ function getNightCount(stDate: string, rtDate: string) {
 
 export async function getRooms(slug: string, stDate: string, rtDate: string): Promise<Array<Room>> {
     const params = new URLSearchParams({stDate, rtDate})
-    const response = await fetch(`http://localhost:4000/pdp/${encodeURIComponent(slug)}/rooms?${params}`)
+    const response = await fetch(`http://188.34.137.61:4000/pdp/${encodeURIComponent(slug)}/rooms?${params}`)
 
     if (!response.ok) {
         throw new Error("Could not load rooms")

@@ -63,7 +63,7 @@ function CommentsGridSkeleton() {
 }
 
 export async function getComments(slug: string): Promise<Array<Comment>> {
-    const response = await fetch(`http://localhost:4000/pdp/${encodeURIComponent(slug)}/comments`)
+    const response = await fetch(`http://188.34.137.61:4000/pdp/${encodeURIComponent(slug)}/comments`)
 
     if (!response.ok) {
         throw new Error("Could not load comments")

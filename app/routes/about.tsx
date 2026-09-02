@@ -193,7 +193,7 @@ function AboutError() {
 }
 
 async function getAboutContent(): Promise<AboutContent> {
-    const response = await fetch(`http://localhost:4000/about`)
+    const response = await fetch(`http://188.34.137.61:4000/about`)
 
     if (!response.ok) {
         throw new Error("Failed to load the about page content")
